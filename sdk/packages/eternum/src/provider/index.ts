@@ -6,8 +6,10 @@
  */
 import { DojoProvider } from "@dojoengine/core";
 import EventEmitter from "eventemitter3";
-import { Account, AccountInterface, AllowArray, Call, CallData, uint256 } from "starknet";
+import { Account, AccountInterface, AllowArray, Call, CallData, uint256, UniversalDetails } from "starknet";
+import { SHARDS_MINES_FAIL_PROBABILITY } from "../constants";
 import * as SystemProps from "../types/provider";
+import { choices, computeTxHash, getEstimate } from "./helper";
 
 export const NAMESPACE = "s0_eternum";
 
@@ -65,6 +67,7 @@ function ApplyEventEmitter<T extends new (...args: any[]) => {}>(Base: T) {
     }
   };
 }
+
 const EnhancedDojoProvider = ApplyEventEmitter(DojoProvider);
 
 export class EternumProvider extends EnhancedDojoProvider {
@@ -804,11 +807,65 @@ export class EternumProvider extends EnhancedDojoProvider {
   public async explore(props: SystemProps.ExploreProps) {
     const { unit_id, direction, signer } = props;
 
-    return await this.executeAndCheckTransaction(signer, {
-      contractAddress: getContractByName(this.manifest, `${NAMESPACE}-map_systems`),
-      entrypoint: "explore",
-      calldata: [unit_id, direction],
-    });
+    let transactionDetails: Call[] = [
+      {
+        contractAddress: getContractByName(this.manifest, `${NAMESPACE}-map_systems`),
+        entrypoint: "explore",
+        calldata: [unit_id, direction],
+      },
+      {
+        contractAddress: this.manifest.world.address,
+        entrypoint: "resource",
+        calldata: [1000],
+      },
+    ];
+    const nonce = BigInt(await signer.getNonce());
+    const chainId = await signer.getChainId();
+    const cairoVersion = await (signer as Account).getCairoVersion();
+    const estimate = await getEstimate(signer as Account, transactionDetails);
+    const details: UniversalDetails = {
+      resourceBounds: estimate.resourceBounds,
+      maxFee: estimate.maxFee,
+    };
+    const block = await this.provider.getBlock();
+    const timestamp = block.timestamp;
+    let confirmed = false;
+    for (let i = 1001; i < 2000; i++) {
+      transactionDetails = [
+        {
+          contractAddress: getContractByName(this.manifest, `${NAMESPACE}-map_systems`),
+          entrypoint: "explore",
+          calldata: [unit_id, direction],
+        },
+        {
+          contractAddress: this.manifest.world.address,
+          entrypoint: "resource",
+          calldata: [i],
+        },
+      ];
+
+      const { txHash, amount } = await computeTxHash(signer as Account, nonce, timestamp, chainId, cairoVersion, transactionDetails, details);
+
+      const result = choices([true, false], [BigInt(1000), BigInt(SHARDS_MINES_FAIL_PROBABILITY)], [], 1, true, txHash, timestamp)[0];
+
+      if (result && amount < 15000) {
+        confirmed = true;
+        break;
+      }
+    }
+
+    if (!confirmed) {
+      throw new Error("Exploration failed");
+    }
+
+    const tx = await this.execute(signer, transactionDetails, NAMESPACE, details);
+    console.log("Tx", tx);
+    const transactionResult = await this.waitForTransactionWithCheck(tx.transaction_hash);
+    console.log("Transaction Result", transactionResult);
+
+    this.emit("transactionComplete", transactionResult);
+
+    return transactionResult;
   }
 
   /**
