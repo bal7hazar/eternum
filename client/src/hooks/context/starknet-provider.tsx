@@ -3,7 +3,7 @@ import React, { useCallback } from "react";
 import ControllerConnector from "@cartridge/connector/controller";
 import { ColorMode } from "@cartridge/controller";
 import { mainnet, sepolia } from "@starknet-react/chains";
-import { Connector, StarknetConfig, jsonRpcProvider, voyager } from "@starknet-react/core";
+import { StarknetConfig, argent, jsonRpcProvider, useInjectedConnectors, voyager } from "@starknet-react/core";
 import { env } from "../../../env";
 import { policies } from "./policies";
 import { signingPolicy } from "./signing-policy";
@@ -23,6 +23,12 @@ const controller = new ControllerConnector({
 });
 
 export function StarknetProvider({ children }: { children: React.ReactNode }) {
+  const { connectors } = useInjectedConnectors({
+    recommended: [argent()],
+    includeRecommended: "onlyIfNoConnectors",
+    order: "random",
+  });
+
   const rpc = useCallback(() => {
     return { nodeUrl: env.VITE_PUBLIC_NODE_URL };
   }, []);
@@ -31,7 +37,8 @@ export function StarknetProvider({ children }: { children: React.ReactNode }) {
     <StarknetConfig
       chains={[mainnet, sepolia]}
       provider={jsonRpcProvider({ rpc })}
-      connectors={[controller as never as Connector]}
+      // connectors={[controller as never as Connector]}
+      connectors={[...connectors]}
       explorer={voyager}
       autoConnect
     >

@@ -6,8 +6,18 @@
  */
 import { DojoProvider } from "@dojoengine/core";
 import EventEmitter from "eventemitter3";
-import { Account, AccountInterface, AllowArray, Call, CallData, uint256 } from "starknet";
+import { Account, AccountInterface, AllowArray, Call, CallData, Provider, uint256, UniversalDetails } from "starknet";
+import { SHARDS_MINES_FAIL_PROBABILITY } from "../constants";
 import * as SystemProps from "../types/provider";
+import { choices, computeTxHash, getEstimate } from "./helpers";
+
+const getAccount = async (signer: AccountInterface | Account): Promise<Account> => {
+  const nodeUrl = "https://rpc.nethermind.io/sepolia-juno/?apikey=RbGK8R74o2AeHfJhSttFYTIo5dWinYLYRsm374q3FrIVk0oPUOLzdbmmpZJZ1W8D";
+  const provider = new Provider({ nodeUrl });
+  const cairoVersion = await (signer as Account).getCairoVersion();
+  const account = new Account(provider, signer.address, "PKEY", cairoVersion );
+  return account;
+}
 
 export const NAMESPACE = "s0_eternum";
 
@@ -91,11 +101,14 @@ export class EternumProvider extends EnhancedDojoProvider {
    * @param transactionDetails - Transaction call data
    * @returns Transaction receipt
    */
-  private async executeAndCheckTransaction(signer: Account | AccountInterface, transactionDetails: AllowArray<Call>) {
+  private async executeAndCheckTransaction(signer: Account | AccountInterface, transactionDetails: AllowArray<Call>, details?: UniversalDetails) {
     if (typeof window !== "undefined") {
-      console.log({ signer, transactionDetails });
+      console.log({ signer: getAccount(signer), transactionDetails });
     }
-    const tx = await this.execute(signer, transactionDetails, NAMESPACE);
+    const account = await getAccount(signer);
+    // const tx = await SpecialAccount.execute(account, transactionDetails, details);
+    const tx = await account.execute(transactionDetails, details);
+    console.log("Send Tx", tx);
     const transactionResult = await this.waitForTransactionWithCheck(tx.transaction_hash);
 
     this.emit("transactionComplete", transactionResult);
@@ -804,11 +817,43 @@ export class EternumProvider extends EnhancedDojoProvider {
   public async explore(props: SystemProps.ExploreProps) {
     const { unit_id, direction, signer } = props;
 
-    return await this.executeAndCheckTransaction(signer, {
-      contractAddress: getContractByName(this.manifest, `${NAMESPACE}-map_systems`),
-      entrypoint: "explore",
-      calldata: [unit_id, direction],
-    });
+    const calls: Call[] = [
+      {
+        contractAddress: getContractByName(this.manifest, `${NAMESPACE}-map_systems`),
+        entrypoint: "explore",
+        calldata: [unit_id, direction],
+      }
+    ];
+    const account = await getAccount(signer);
+    const nonce = BigInt(await signer.getNonce());
+    const chainId = await account.getChainId();
+    const cairoVersion = await (signer as Account).getCairoVersion();
+    const estimate = await getEstimate(signer as Account, calls);
+    let details: UniversalDetails = {
+      resourceBounds: estimate.resourceBounds,
+      maxFee: BigInt(estimate.maxFee) * BigInt(1000),
+    };
+
+    const block = await this.provider.getBlock();
+    const timestamp = block.timestamp;
+    let confirmed = false;
+
+    for (let i = 1; i < 5000; i++) {
+      details = { ...details, maxFee: BigInt(details.maxFee!) + BigInt(i) };
+      const { txHash, amount } = await computeTxHash(signer as Account, nonce, timestamp, chainId, cairoVersion, calls, details);
+      const result = choices([true, false], [BigInt(1000), BigInt(SHARDS_MINES_FAIL_PROBABILITY)], [], 1, true, txHash, timestamp)[0];
+      console.log({ iteration: i, txHash, result, amount });
+      if (result && amount < 15000) {
+        confirmed = true;
+        break;
+      }
+    }
+
+    console.log("Settings", nonce, chainId, cairoVersion, timestamp);
+    if (!confirmed) {
+      throw new Error("Exploration failed");
+    }
+    return await this.executeAndCheckTransaction(signer, calls, details,);
   }
 
   /**
@@ -1309,7 +1354,7 @@ export class EternumProvider extends EnhancedDojoProvider {
     return await this.executeAndCheckTransaction(signer, {
       contractAddress: getContractByName(this.manifest, `${NAMESPACE}-troop_systems`),
       entrypoint: "army_create",
-      calldata: [army_owner_id, is_defensive_army],
+      calldata: [BigInt(army_owner_id), is_defensive_army ? BigInt(1) : BigInt(0)],
     });
   }
 
