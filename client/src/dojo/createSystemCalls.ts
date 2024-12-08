@@ -130,6 +130,10 @@ export function createSystemCalls({ provider }: SetupNetworkResult) {
     await provider.claim_quest(props);
   };
 
+  const claim_quests = async (props: SystemProps.ClaimQuestProps[]) => {
+    await provider.claim_quests(props);
+  };
+
   const mint_resources = async (props: SystemProps.MintResourcesProps) => {
     await provider.mint_resources(props);
   };
@@ -272,6 +276,7 @@ export function createSystemCalls({ provider }: SetupNetworkResult) {
     claim_leaderboard_rewards,
 
     claim_quest,
+    claim_quests,
     mint_resources,
 
     army_buy_troops,

@@ -2,6 +2,7 @@ import { configManager } from "@/dojo/setup";
 import { useDojo } from "@/hooks/context/DojoContext";
 import { useEntities, useEntitiesUtils } from "@/hooks/helpers/useEntities";
 import { useQuery } from "@/hooks/helpers/useQuery";
+import useScriptStore from "@/hooks/store/useScriptStore";
 import useUIStore from "@/hooks/store/useUIStore";
 import { soundSelector, useUiSounds } from "@/hooks/useUISound";
 import { Position } from "@/types/Position";
@@ -91,6 +92,7 @@ const WorkersHutTooltipContent = () => {
 };
 
 export const TopLeftNavigation = () => {
+  const { shows } = useScriptStore();
   const { setup } = useDojo();
 
   const { isMapView, handleUrlChange, hexPosition } = useQuery();
@@ -121,12 +123,13 @@ export const TopLeftNavigation = () => {
 
   const structuresWithFavorites = useMemo(() => {
     return structures
+      .filter((structure) => shows.length > 0 ? shows.includes(structure.entity_id) : true)
       .map((structure) => ({
         ...structure,
         isFavorite: favorites.includes(structure.entity_id),
       }))
       .sort((a, b) => Number(b.isFavorite) - Number(a.isFavorite));
-  }, [favorites, structures]);
+  }, [favorites, structures, shows]);
 
   const toggleFavorite = useCallback((entityId: number) => {
     setFavorites((prev) => {

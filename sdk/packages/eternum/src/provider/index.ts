@@ -6,7 +6,7 @@
  */
 import { DojoProvider } from "@dojoengine/core";
 import EventEmitter from "eventemitter3";
-import { Account, AccountInterface, AllowArray, Call, CallData, uint256 } from "starknet";
+import { Account, AccountInterface, AllowArray, BigNumberish, Call, CallData, uint256 } from "starknet";
 import * as SystemProps from "../types/provider";
 import { TransactionType } from "./types";
 export const NAMESPACE = "s0_eternum";
@@ -579,6 +579,22 @@ export class EternumProvider extends EnhancedDojoProvider {
         calldata: [questId, receiver_id],
       })),
     ];
+
+    return await this.executeAndCheckTransaction(signer, calldata);
+  }
+
+  public async claim_quests(props: SystemProps.ClaimQuestProps[]) {
+    const signer = props[0].signer;
+    const calldata: { contractAddress: string; entrypoint: string; calldata: BigNumberish[] }[] = [];
+    props.forEach(({ receiver_id, quest_ids }) => {
+      calldata.push(
+        ...quest_ids.map((questId) => ({
+          contractAddress: getContractByName(this.manifest, `${NAMESPACE}-realm_systems`),
+          entrypoint: "quest_claim",
+          calldata: [questId, receiver_id],
+        })),
+      );
+    });
 
     return await this.executeAndCheckTransaction(signer, calldata);
   }
