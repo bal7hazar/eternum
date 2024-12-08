@@ -38,6 +38,19 @@ export const SelectResources = ({
     playResourceSound(unselectedResources[0].id);
   };
 
+  const allResourceGive = () => {
+    setSelectedResourceIds([...selectedResourceIds, ...unselectedResources.map((res) => res.id)]);
+    const newResourceAmounts: Record<string, number> = {};
+    unselectedResources.forEach((res) => {
+      newResourceAmounts[res.id] = divideByPrecision(getBalance(entity_id, res.id)?.balance || 0);
+    });
+    setSelectedResourceAmounts({
+      ...selectedResourceAmounts,
+      ...newResourceAmounts,
+    });
+    playResourceSound(unselectedResources[0].id);
+  };
+
   return (
     <div className=" items-center col-span-4 space-y-2 p-3">
       {selectedResourceIds.map((id: any, index: any) => {
@@ -94,9 +107,12 @@ export const SelectResources = ({
           </div>
         );
       })}
-      <div className="mt-12">
+      <div className="mt-12 flex flex-col gap-y-2">
         <Button variant="primary" size="md" onClick={addResourceGive}>
           Add Resource
+        </Button>
+        <Button variant="primary" size="md" onClick={allResourceGive}>
+          All Resources
         </Button>
       </div>
     </div>
