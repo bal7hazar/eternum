@@ -126,7 +126,7 @@ export const LeftNavigationModule = () => {
         name: MenuEnum.construction,
         button: (
           <CircleButton
-            disabled={!structureIsMine || !isRealm}
+            disabled={false}
             className="construction-selector"
             image={BuildingThumbs.construction}
             tooltipLocation="top"
