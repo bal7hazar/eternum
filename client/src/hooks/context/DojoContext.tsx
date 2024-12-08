@@ -69,7 +69,7 @@ const useMasterAccount = (rpcProvider: RpcProvider) => {
   return useMemo(() => new Account(rpcProvider, masterAddress, privateKey), [rpcProvider, masterAddress, privateKey]);
 };
 
-const useRpcProvider = () => {
+export const useRpcProvider = () => {
   return useMemo(
     () =>
       new RpcProvider({
