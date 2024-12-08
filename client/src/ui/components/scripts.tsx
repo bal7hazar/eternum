@@ -1,5 +1,7 @@
 import clsx from "clsx";
 import { useState } from "react";
+import { Build } from "./scripts/build";
+import { Print } from "./scripts/print";
 import { Show } from "./scripts/show";
 import { Skip } from "./scripts/skip";
 
@@ -15,8 +17,10 @@ export const Scripts = () => {
         {unfolded ? "-" : "+"}
       </div>
       <div className={clsx("text-black px-2 flex flex-col gap-y-2", unfolded ? "block" : "hidden")}>
+        <Print />
         <Show />
         <Skip />
+        <Build />
       </div>
     </div>
   );

@@ -1027,6 +1027,19 @@ export class EternumProvider extends EnhancedDojoProvider {
     });
   }
 
+  public async create_buildings(props: SystemProps.CreateBuildingProps[]) {
+    const { signer } = props[0];
+    const calldata: { contractAddress: string; entrypoint: string; calldata: BigNumberish[] }[] = [];
+    props.forEach(({ entity_id, directions, building_category, produce_resource_type }) => {
+      calldata.push({
+          contractAddress: getContractByName(this.manifest, `${NAMESPACE}-building_systems`),
+          entrypoint: "create",
+          calldata: CallData.compile([entity_id, directions, building_category, produce_resource_type]),
+      });
+    });
+    return await this.executeAndCheckTransaction(signer, calldata);
+  }
+
   /**
    * Destroy an existing building
    *

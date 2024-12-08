@@ -40,9 +40,7 @@ export const Skip = () => {
 
       try {
         const quest_ids = unclaimedQuests.flatMap((quest) => quest.prizes.map((prize) => BigInt(prize.id)));
-        console.log(quest_ids);
-        const receiver_ids = skips.length > 0 ? skips : structures.map((structure) => structure.entity_id);
-        console.log(receiver_ids);
+        const receiver_ids = skips.length > 0 ? skips : structures.filter((structure) => structure.category === 'Realm').map((structure) => structure.entity_id);
         await claim_quests(
           receiver_ids.map((receiver_id) => {
             return {

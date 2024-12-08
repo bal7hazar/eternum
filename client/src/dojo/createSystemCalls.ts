@@ -70,6 +70,10 @@ export function createSystemCalls({ provider }: SetupNetworkResult) {
     await provider.create_building(props);
   };
 
+  const create_buildings = async (props: SystemProps.CreateBuildingProps[]) => {
+    await provider.create_buildings(props);
+  };
+
   const destroy_building = async (props: SystemProps.DestroyBuildingProps) => {
     await provider.destroy_building(props);
   };
@@ -263,6 +267,7 @@ export function createSystemCalls({ provider }: SetupNetworkResult) {
     pause_production,
     resume_production,
     create_building,
+    create_buildings,
     create_army,
     delete_army,
     uuid,

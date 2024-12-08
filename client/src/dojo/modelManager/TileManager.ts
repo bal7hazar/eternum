@@ -475,7 +475,7 @@ export class TileManager {
   };
 }
 
-function getDirectionsArray(start: [number, number], end: [number, number]): Direction[] {
+export function getDirectionsArray(start: [number, number], end: [number, number]): Direction[] {
   const [startCol, startRow] = start;
   const [endCol, endRow] = end;
 
