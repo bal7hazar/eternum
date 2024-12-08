@@ -7,7 +7,7 @@ export const Scripts = () => {
   const [unfolded, setUnfolded] = useState(true);
 
   return (
-    <div className="absolute top-0 left-1/2 -translate-x-1/2 bg-slate-700/70 z-[1000000] rounded-b-md overflow-hidden flex flex-col items-center p-2 w-[400px] gap-y-2">
+    <div className={clsx("absolute top-0 left-1/2 -translate-x-1/2 z-[1000000] rounded-b-md overflow-hidden flex flex-col items-center p-2 gap-y-2", unfolded ? "w-[400px] bg-slate-700/70" : "w-[20px]")}>
       <div
         className="text-sm h-4 w-4 flex justify-center items-center cursor-pointer border border-yellow-500 rounded-sm"
         onClick={() => setUnfolded(!unfolded)}
