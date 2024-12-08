@@ -1,4 +1,5 @@
 import plugin from "@tailwindcss/forms";
+import typography from "@tailwindcss/typography";
 
 /** @type {import('tailwindcss').Config} */
 export default {
@@ -226,7 +227,7 @@ export default {
     "bg-enemy",
   ],
   plugins: [
-    require("@tailwindcss/typography"),
+    typography,
     plugin(function ({ addUtilities }) {
       const newUtilities = {
         ".border-gradient": {
