@@ -150,7 +150,7 @@ export const TopLeftNavigation = () => {
       ? getComponentValue(setup.components.Position, getEntityIdFromKeys([BigInt(entityId)]))
       : { x: hexPosition.col, y: hexPosition.row };
 
-    if (!newPosition) throw new Error("No position found");
+    if (!newPosition) throw new Error("No position found!");
 
     const url = new Position({ x: newPosition.x, y: newPosition.y }).toMapLocationUrl();
 
