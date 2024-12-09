@@ -86,6 +86,16 @@ export class ArmyManager {
     });
   }
 
+  public createArmies(structureEntityIds: bigint[], isDefensive: boolean): void {
+    this.dojo.setup.systemCalls.create_armies(
+      structureEntityIds.map((structureEntityId) => ({
+        signer: this.dojo.account.account,
+        is_defensive_army: isDefensive,
+        army_owner_id: structureEntityId,
+      })),
+    );
+  }
+
   public async deleteArmy(armyId: ID): Promise<void> {
     await this.dojo.setup.systemCalls.delete_army({
       signer: this.dojo.account.account,

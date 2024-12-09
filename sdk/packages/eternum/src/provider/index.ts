@@ -727,6 +727,19 @@ export class EternumProvider extends EnhancedDojoProvider {
     });
   }
 
+  public async transfers_resources(props: SystemProps.TransferResourcesProps[]) {
+    const signer = props[0].signer;
+    const calldata: { contractAddress: string; entrypoint: string; calldata: BigNumberish[] }[] = [];
+    props.forEach(({ sending_entity_id, receiving_entity_id, resources }) => {
+      calldata.push({
+        contractAddress: getContractByName(this.manifest, `${NAMESPACE}-resource_systems`),
+        entrypoint: "transfer",
+        calldata: [sending_entity_id, receiving_entity_id, resources.length / 2, ...resources],
+      });
+    });
+    return await this.executeAndCheckTransaction(signer, calldata);
+  }
+
   /**
    * Send resources from one entity to another
    *
@@ -1501,6 +1514,20 @@ export class EternumProvider extends EnhancedDojoProvider {
     });
   }
 
+  public async create_armies(props: SystemProps.ArmyCreateProps[]) {
+    const { signer } = props[0];
+    const calldata: { contractAddress: string; entrypoint: string; calldata: BigNumberish[] }[] = [];
+    props.forEach(({ army_owner_id, is_defensive_army }) => {
+      calldata.push({
+        contractAddress: getContractByName(this.manifest, `${NAMESPACE}-troop_systems`),
+        entrypoint: "army_create",
+        calldata: [army_owner_id, is_defensive_army ? 1 : 0],
+      });
+    });
+
+    return await this.executeAndCheckTransaction(signer, calldata);
+  }
+
   public async delete_army(props: SystemProps.ArmyDeleteProps) {
     const { army_id, signer } = props;
 
@@ -1519,6 +1546,20 @@ export class EternumProvider extends EnhancedDojoProvider {
       entrypoint: "army_buy_troops",
       calldata: [army_id, payer_id, troops.knight_count, troops.paladin_count, troops.crossbowman_count],
     });
+  }
+
+  public async armies_buy_troops(props: SystemProps.ArmyBuyTroopsProps[]) {
+    const { signer } = props[0];
+    const calldata: { contractAddress: string; entrypoint: string; calldata: BigNumberish[] }[] = [];
+    props.forEach(({ army_id, payer_id, troops }) => {
+      calldata.push({
+        contractAddress: getContractByName(this.manifest, `${NAMESPACE}-troop_systems`),
+        entrypoint: "army_buy_troops",
+        calldata: [army_id, payer_id, troops.knight_count, troops.paladin_count, troops.crossbowman_count],
+      });
+    });
+
+    return await this.executeAndCheckTransaction(signer, calldata);
   }
 
   public async army_merge_troops(props: SystemProps.ArmyMergeTroopsProps) {

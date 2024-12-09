@@ -50,6 +50,10 @@ export function createSystemCalls({ provider }: SetupNetworkResult) {
     await provider.transfer_resources(props);
   };
 
+  const transfers_resources = async (props: SystemProps.TransferResourcesProps[]) => {
+    await provider.transfers_resources(props);
+  };
+
   const travel_hex = async (props: SystemProps.TravelHexProps) => {
     await provider.travel_hex(props);
   };
@@ -118,12 +122,20 @@ export function createSystemCalls({ provider }: SetupNetworkResult) {
     await provider.create_army(props);
   };
 
+  const create_armies = async (props: SystemProps.ArmyCreateProps[]) => {
+    await provider.create_armies(props);
+  };
+
   const delete_army = async (props: SystemProps.ArmyDeleteProps) => {
     await provider.delete_army(props);
   };
 
   const army_buy_troops = async (props: SystemProps.ArmyBuyTroopsProps) => {
     await provider.army_buy_troops(props);
+  };
+
+  const armies_buy_troops = async (props: SystemProps.ArmyBuyTroopsProps[]) => {
+    await provider.armies_buy_troops(props);
   };
 
   const army_merge_troops = async (props: SystemProps.ArmyMergeTroopsProps) => {
@@ -262,6 +274,7 @@ export function createSystemCalls({ provider }: SetupNetworkResult) {
     create_multiple_realms,
     create_multiple_realms_dev,
     transfer_resources,
+    transfers_resources,
     travel_hex,
     destroy_building,
     pause_production,
@@ -269,6 +282,7 @@ export function createSystemCalls({ provider }: SetupNetworkResult) {
     create_building,
     create_buildings,
     create_army,
+    create_armies,
     delete_army,
     uuid,
 
@@ -285,6 +299,7 @@ export function createSystemCalls({ provider }: SetupNetworkResult) {
     mint_resources,
 
     army_buy_troops,
+    armies_buy_troops,
     army_merge_troops,
 
     create_guild,
