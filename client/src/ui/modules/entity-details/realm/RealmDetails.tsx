@@ -1,11 +1,10 @@
-import { configManager } from "@/dojo/setup";
-import { useIsStructureImmune, useStructureByEntityId } from "@/hooks/helpers/useStructures";
+import { useIsStructureImmune, useStructureByEntityId, useStructureImmunityTimer } from "@/hooks/helpers/useStructures";
 import useUIStore from "@/hooks/store/useUIStore";
 import { HintSection } from "@/ui/components/hints/HintModal";
 import { HintModalButton } from "@/ui/elements/HintModalButton";
 import { Tabs } from "@/ui/elements/tab";
 import { copyPlayerAddressToClipboard, displayAddress, formatTime, toHexString } from "@/ui/utils/utils";
-import { StructureType, TickIds } from "@bibliothecadao/eternum";
+import { StructureType } from "@bibliothecadao/eternum";
 import { useMemo, useState } from "react";
 import { Buildings } from "./Buildings";
 import { Castle } from "./Castle";
@@ -20,8 +19,6 @@ export const RealmDetails = () => {
   const isRealm = useMemo(() => {
     return structure?.category === StructureType[StructureType.Realm];
   }, [structure]);
-
-  const isImmune = useIsStructureImmune(Number(structure?.created_at), nextBlockTimestamp!);
 
   const address = useMemo(() => {
     return toHexString(structure?.owner?.address || 0n);
@@ -44,16 +41,8 @@ export const RealmDetails = () => {
     [structure],
   );
 
-  const immunityEndTimestamp = useMemo(() => {
-    return (
-      Number(structure?.created_at) + configManager.getBattleGraceTickCount() * configManager.getTick(TickIds.Armies)
-    );
-  }, [structure?.created_at, configManager]);
-
-  const timer = useMemo(() => {
-    if (!nextBlockTimestamp) return 0;
-    return immunityEndTimestamp - nextBlockTimestamp!;
-  }, [nextBlockTimestamp]);
+  const isImmune = useIsStructureImmune(structure, nextBlockTimestamp || 0);
+  const timer = useStructureImmunityTimer(structure, nextBlockTimestamp || 0);
 
   return (
     structure && (
@@ -104,14 +93,14 @@ export const RealmDetails = () => {
             selectedIndex={selectedTab}
             onChange={(index: number) => setSelectedTab(index)}
             variant="default"
-            className="h-full "
+            className="h-full"
           >
             <Tabs.List className="border border-gold/20 rounded-lg p-1">
               {tabs.map((tab, index) => (
                 <Tabs.Tab key={index}>{tab.label}</Tabs.Tab>
               ))}
             </Tabs.List>
-            <Tabs.Panels className="">
+            <Tabs.Panels>
               {tabs.map((tab, index) => (
                 <Tabs.Panel key={index}>{tab.component}</Tabs.Panel>
               ))}

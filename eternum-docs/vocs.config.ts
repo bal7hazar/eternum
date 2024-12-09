@@ -4,7 +4,7 @@ export default defineConfig({
   description: "Eternum Documentation",
   iconUrl: "/eternum_new_logo.svg",
   logoUrl: "/eternum_new_logo.svg",
-  ogImageUrl: "/og-image.png",
+  ogImageUrl: "/eternum_documentation.png",
   theme: {
     colorScheme: "dark",
     variables: {
@@ -27,6 +27,7 @@ export default defineConfig({
         // { text: "Welcome", link: "/overview/welcome" },
         { text: "Introduction", link: "/overview/introduction" },
         { text: "Game Entry", link: "/overview/entry" },
+        { text: "Cartridge Controller", link: "/overview/controller" },
         { text: "Quick Links", link: "/overview/links" },
         { text: "Disclaimer - MUST READ", link: "/overview/disclaimer" },
       ],
@@ -36,7 +37,7 @@ export default defineConfig({
       items: [
         { text: "Key Concepts", link: "/mechanics/key-concepts" },
         {
-          text: "Realm management",
+          text: "Realm Management",
           collapsed: true,
           items: [
             { text: "Realm", link: "/mechanics/realm/realm" },
@@ -87,6 +88,7 @@ export default defineConfig({
         { text: "Contracts", link: "/development/contracts" },
         { text: "SDK", link: "/development/sdk" },
         { text: "Common issues", link: "/development/common-issues" },
+        { text: "Collaborators", link: "/development/collaborators" },
       ],
     },
   ],

@@ -2,7 +2,13 @@ import type { Config } from "@bibliothecadao/eternum";
 import devManifest from "../contracts/manifest_dev.json";
 import productionManifest from "../contracts/manifest_prod.json";
 
-import { CapacityConfigCategory, EternumConfig, EternumGlobalConfig, EternumProvider } from "@bibliothecadao/eternum";
+import {
+  CapacityConfigCategory,
+  EternumConfig,
+  EternumGlobalConfig,
+  EternumProvider,
+  ResourceTier,
+} from "@bibliothecadao/eternum";
 import { Account } from "starknet";
 import { MAX_QUEST_RESOURCES } from "./speed";
 
@@ -66,10 +72,17 @@ const setupConfig: Config =
           delaySeconds: 0,
         },
 
+        // increase the probability of failure for shards mines
+        exploration: {
+          ...EternumGlobalConfig.exploration,
+          shardsMinesFailProbability: 10000,
+        },
+
         // bridge close after 2 hours in dev mode
         season: {
           ...EternumGlobalConfig.season,
-          bridgeCloseAfterEndSeconds: 60 * 60 * 2, // 2 hours
+          startAfterSeconds: 60 * 10, // 10 minutes
+          bridgeCloseAfterEndSeconds: 60 * 60 * 1, // 2 hours
         },
 
         // bridge fees to multi in dev mode
@@ -87,12 +100,29 @@ const setupConfig: Config =
           //   min_amount: 1,
           //   max_amount: 1,
           // })),
-          hyperstructurePointsForWin: 500_000,
-          hyperstructureTotalCosts: EternumGlobalConfig.hyperstructures.hyperstructureTotalCosts.map((cost) => ({
-            resource_tier: cost.resource_tier,
-            min_amount: Math.floor(Math.random() * 10) + 1,
-            max_amount: Math.floor(Math.random() * 10) + 1,
-          })),
+          hyperstructurePointsForWin: 100_000,
+          hyperstructureTotalCosts: [
+            ...EternumGlobalConfig.hyperstructures.hyperstructureTotalCosts.map((cost) => ({
+              resource_tier: cost.resource_tier,
+              min_amount: Math.floor(Math.random() * 4) + 1,
+              max_amount: Math.floor(Math.random() * 10) + 5,
+            })),
+            {
+              resource_tier: ResourceTier.Lords,
+              min_amount: 3,
+              max_amount: 3,
+            },
+            {
+              resource_tier: ResourceTier.Food,
+              min_amount: 0,
+              max_amount: 0,
+            },
+            {
+              resource_tier: ResourceTier.Military,
+              min_amount: 0,
+              max_amount: 0,
+            },
+          ],
         },
       }
     : EternumGlobalConfig;
