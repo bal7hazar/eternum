@@ -12,7 +12,7 @@ use s0_eternum::{
 };
 use starknet::ContractAddress;
 
-const LEADERBOARD_REGISTRATION_PERIOD: u64 = 604800; // one week
+const LEADERBOARD_REGISTRATION_PERIOD: u64 = 60 * 60 * 24 * 4; // one week
 
 #[starknet::interface]
 trait IHyperstructureSystems<T> {
@@ -440,7 +440,6 @@ mod hyperstructure_systems {
             hyperstructure_shareholder_epochs: Span<(ID, u16)>
         ) -> (u128, u128, u128, u128) {
             let mut world: WorldStorage = self.world(DEFAULT_NS());
-            SeasonImpl::assert_season_is_not_over(world);
 
             let hyperstructure_resource_configs = HyperstructureResourceConfigTrait::get_all(world);
             let contribution_points = InternalHyperstructureSystemsImpl::compute_total_contribution_points(
@@ -591,8 +590,16 @@ mod hyperstructure_systems {
                 end_point_generation_at = season.ended_at;
             }
 
+            let mut points_already_added: Felt252Dict<bool> = Default::default();
+
             while (i < hyperstructure_shareholder_epochs.len()) {
                 let (hyperstructure_entity_id, index) = *hyperstructure_shareholder_epochs.at(i);
+
+                // ensure we don't double count points for the same hyperstructure
+                if points_already_added.get(hyperstructure_entity_id.into()) {
+                    panic!("points already added for hyperstructure {}", hyperstructure_entity_id);
+                };
+                points_already_added.insert(hyperstructure_entity_id.into(), true);
 
                 let epoch: Epoch = world.read_model((hyperstructure_entity_id, index));
                 let next_epoch: Epoch = world.read_model((hyperstructure_entity_id, index + 1));
@@ -638,6 +645,7 @@ mod hyperstructure_systems {
 
             let hyperstructure_config: HyperstructureConfig = world.read_model(HYPERSTRUCTURE_CONFIG_ID);
 
+            let mut points_already_added: Felt252Dict<bool> = Default::default();
             let mut total_points = 0;
 
             let mut i = 0;
@@ -650,21 +658,29 @@ mod hyperstructure_systems {
 
                 let mut hyperstructure: Hyperstructure = world.read_model(hyperstructure_entity_id);
 
-                if (!hyperstructure.completed) {
-                    continue;
-                }
-                let total_contributable_amount = calculate_total_contributable_amount(
-                    world, hyperstructure.randomness, hyperstructure_resource_configs
-                );
-                total_points +=
-                    Self::compute_contributions_for_hyperstructure(
-                        world,
-                        total_contributable_amount,
-                        hyperstructure_entity_id,
-                        resources_with_rarity,
-                        hyperstructure_config.points_on_completion,
-                        player_address
+                if (hyperstructure.completed) {
+                    // ensure we don't double count points for the same hyperstructure
+                    if points_already_added.get(hyperstructure_entity_id.into()) {
+                        panic!("points already added for hyperstructure {}", hyperstructure_entity_id);
+                    };
+                    points_already_added.insert(hyperstructure_entity_id.into(), true);
+
+                    // calculate the total contributable amount for the hyperstructure
+                    let total_contributable_amount = calculate_total_contributable_amount(
+                        world, hyperstructure.randomness, hyperstructure_resource_configs
                     );
+
+                    // calculate the total points for the hyperstructure
+                    total_points +=
+                        Self::compute_contributions_for_hyperstructure(
+                            world,
+                            total_contributable_amount,
+                            hyperstructure_entity_id,
+                            resources_with_rarity,
+                            hyperstructure_config.points_on_completion,
+                            player_address
+                        );
+                }
 
                 i += 1;
             };

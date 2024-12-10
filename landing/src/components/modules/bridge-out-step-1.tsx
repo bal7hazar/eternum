@@ -1,26 +1,29 @@
 import { configManager } from "@/dojo/setup";
 import { useEntities } from "@/hooks/helpers/useEntities";
 import { useRealm } from "@/hooks/helpers/useRealms";
+import { getResourceBalance } from "@/hooks/helpers/useResources";
 import { useBridgeAsset } from "@/hooks/useBridge";
 import { useTravel } from "@/hooks/useTravel";
-import { displayAddress } from "@/lib/utils";
+import { displayAddress, multiplyByPrecision } from "@/lib/utils";
 import {
   ADMIN_BANK_ENTITY_ID,
-  BRIDGE_FEE_DENOMINATOR,
   DONKEY_ENTITY_TYPE,
-  EternumGlobalConfig,
   RESOURCE_PRECISION,
+  resources,
   ResourcesIds,
 } from "@bibliothecadao/eternum";
+import { TooltipContent, TooltipTrigger } from "@radix-ui/react-tooltip";
 import { useAccount } from "@starknet-react/core";
-import { Loader, Plus } from "lucide-react";
+import { InfoIcon, Loader, Plus } from "lucide-react";
 import { useMemo, useState } from "react";
 import { TypeP } from "../typography/type-p";
 import { Button } from "../ui/button";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui/collapsible";
+import { ResourceIcon } from "../ui/elements/ResourceIcon";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { SelectSingleResource } from "../ui/SelectResources";
+import { Tooltip, TooltipProvider } from "../ui/tooltip";
 import { calculateDonkeysNeeded, getSeasonAddresses, getTotalResourceWeight } from "../ui/utils/utils";
+import { BridgeFees } from "./bridge-fees";
 
 function formatFee(fee: number) {
   return fee.toFixed(2);
@@ -31,6 +34,7 @@ export const BridgeOutStep1 = () => {
 
   const { getRealmNameById } = useRealm();
   const { computeTravelTime } = useTravel();
+  const [isFeesOpen, setIsFeesOpen] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
   const [realmEntityId, setRealmEntityId] = useState<string>("");
@@ -43,34 +47,17 @@ export const BridgeOutStep1 = () => {
     [selectedResourceAmounts, selectedResourceId],
   );
 
-  const bridgeConfig = EternumGlobalConfig.bridge;
+  const [resourceFees, setResourceFees] = useState<
+    {
+      velordsFee: string;
+      seasonPoolFee: string;
+      clientFee: string;
+      bankFee: string;
+      totalFee?: string;
+    }[]
+  >([]);
 
-  const calculateBridgeFee = (percent: number) => {
-    return (percent * Number(selectedResourceAmount)) / BRIDGE_FEE_DENOMINATOR;
-  };
-
-  const calculateBridgeFeeDisplayPercent = (percent: number) => {
-    return (percent * 100) / BRIDGE_FEE_DENOMINATOR;
-  };
-
-  const velordsFeeOnWithdrawal = useMemo(
-    () => formatFee(calculateBridgeFee(bridgeConfig.velords_fee_on_wtdr_percent)),
-    [selectedResourceAmount],
-  );
-  const seasonPoolFeeOnWithdrawal = useMemo(
-    () => formatFee(calculateBridgeFee(bridgeConfig.season_pool_fee_on_wtdr_percent)),
-    [selectedResourceAmount],
-  );
-  const clientFeeOnWithdrawal = useMemo(
-    () => formatFee(calculateBridgeFee(bridgeConfig.client_fee_on_wtdr_percent)),
-    [selectedResourceAmount],
-  );
-  const bankFeeOnWithdrawal = useMemo(
-    () => formatFee(calculateBridgeFee(bridgeConfig.max_bank_fee_dpt_percent)),
-    [selectedResourceAmount],
-  );
-
-  const totalFeeOnWithdrawal = useMemo(
+  /*const totalFeeOnWithdrawal = useMemo(
     () =>
       formatFee(
         Number(velordsFeeOnWithdrawal) +
@@ -79,7 +66,15 @@ export const BridgeOutStep1 = () => {
           Number(bankFeeOnWithdrawal),
       ),
     [velordsFeeOnWithdrawal, seasonPoolFeeOnWithdrawal, clientFeeOnWithdrawal, bankFeeOnWithdrawal],
-  );
+  );*/
+  const { getBalance } = getResourceBalance();
+  const donkeyBalance = useMemo(() => {
+    if (realmEntityId) {
+      return getBalance(Number(realmEntityId), ResourcesIds.Donkey);
+    } else {
+      return { balance: 0 };
+    }
+  }, [getBalance, realmEntityId]);
 
   const { playerRealms } = useEntities();
   const playerRealmsIdAndName = useMemo(() => {
@@ -111,7 +106,9 @@ export const BridgeOutStep1 = () => {
 
   const orderWeight = useMemo(() => {
     if (selectedResourceIds.length > 0) {
-      const totalWeight = getTotalResourceWeight([{ resourceId: selectedResourceId, amount: selectedResourceAmount }]);
+      const totalWeight = getTotalResourceWeight([
+        { resourceId: selectedResourceId, amount: multiplyByPrecision(selectedResourceAmount) },
+      ]);
       return totalWeight;
     } else {
       return 0;
@@ -197,44 +194,33 @@ export const BridgeOutStep1 = () => {
           <div>{travelTimeInHoursAndMinutes(travelTime ?? 0)}</div>
         </div>
         <div className="flex justify-between">
-          <div>Donkeys Needed</div>
-          <div>{donkeysNeeded}</div>
+          <div>
+            Donkeys Burnt
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <InfoIcon className="ml-2 w-4 h-4" />
+                </TooltipTrigger>
+                <TooltipContent className="bg-background border rounded p-2 max-w-56">
+                  Donkeys are required to transport the resources to the bank
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+          <div className="flex items-center gap-2">
+            {donkeysNeeded} / {donkeyBalance.balance} <ResourceIcon resource={"Donkey"} size="md" />
+          </div>
         </div>
-        <hr />
-        <Collapsible>
-          <CollapsibleTrigger asChild>
-            <Button className="w-full flex justify-between font-bold px-0" variant={"ghost"}>
-              <div className="flex items-center">
-                <Plus className="mr-4" />
-                Total Transfer Fee
-              </div>
-              <div>{totalFeeOnWithdrawal}</div>
-            </Button>
-          </CollapsibleTrigger>
-          <CollapsibleContent className="flex flex-col gap-2">
-            <div className="flex justify-between text-xs">
-              <div>Bank Fees ({calculateBridgeFeeDisplayPercent(bridgeConfig.max_bank_fee_wtdr_percent)}%)</div>
-              <div>{bankFeeOnWithdrawal}</div>
-            </div>
-            <div className="flex justify-between text-xs">
-              <div>Velords Fees ({calculateBridgeFeeDisplayPercent(bridgeConfig.velords_fee_on_wtdr_percent)}%)</div>
-              <div>{velordsFeeOnWithdrawal}</div>
-            </div>
-            <div className="flex justify-between text-xs">
-              <div>
-                Season Pool Fees ({calculateBridgeFeeDisplayPercent(bridgeConfig.season_pool_fee_on_wtdr_percent)}%)
-              </div>
-              <div>{seasonPoolFeeOnWithdrawal}</div>
-            </div>
-            <div className="flex justify-between text-xs">
-              <div>Client Fees ({calculateBridgeFeeDisplayPercent(bridgeConfig.client_fee_on_wtdr_percent)}%)</div>
-              <div>{clientFeeOnWithdrawal}</div>
-            </div>
-          </CollapsibleContent>
-        </Collapsible>
+        <BridgeFees
+          isOpen={isFeesOpen}
+          onOpenChange={setIsFeesOpen}
+          resourceSelections={selectedResourceAmounts}
+          setResourceFees={setResourceFees}
+          type="withdrawal"
+        />
         <div className="flex justify-between font-bold mt-5 mb-5">
           <div>Total Amount Received</div>
-          <div>{formatFee(Number(selectedResourceAmount) - Number(totalFeeOnWithdrawal))}</div>
+          <div>{formatFee(Number(selectedResourceAmount) /*- Number(totalFeeOnWithdrawal))*/)}</div>
         </div>
       </div>
       <Button
@@ -261,9 +247,21 @@ export const SelectResourceRow = ({
   selectedResourceAmounts: { [key: string]: number };
   setSelectedResourceAmounts: (value: { [key: string]: number }) => void;
 }) => {
+  const unselectedResources = useMemo(
+    () => resources.filter((res) => !selectedResourceIds.includes(res.id)),
+    [selectedResourceIds],
+  );
+  const addResourceGive = () => {
+    setSelectedResourceIds([...selectedResourceIds, unselectedResources[0].id]);
+    setSelectedResourceAmounts({
+      ...selectedResourceAmounts,
+      [unselectedResources[0].id]: 1,
+    });
+  };
+
   return (
     <div className="grid grid-cols-0 gap-8 h-full">
-      <div className=" bg-gold/10  h-auto border border-gold/40">
+      <div className=" bg-gold/10  h-auto border border-gold/40 flex flex-col items-center">
         <SelectSingleResource
           selectedResourceIds={selectedResourceIds}
           setSelectedResourceIds={setSelectedResourceIds}
@@ -271,6 +269,9 @@ export const SelectResourceRow = ({
           setSelectedResourceAmounts={setSelectedResourceAmounts}
           entity_id={realmEntityId}
         />
+        <Button variant="default" className="mb-4" size="default" onClick={addResourceGive}>
+          <Plus />
+        </Button>
       </div>
     </div>
   );

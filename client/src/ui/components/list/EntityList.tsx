@@ -4,6 +4,7 @@ import Button from "@/ui/elements/Button";
 import { ID } from "@bibliothecadao/eternum";
 import clsx from "clsx";
 import React, { useEffect, useState } from "react";
+import { NavigateToPositionIcon } from "../military/ArmyChip";
 import { ViewOnMapIcon } from "../military/ArmyManagementCard";
 
 interface EntityListProps {
@@ -45,7 +46,11 @@ export const EntityList = ({
   }, [current]);
 
   const filteredList = list
-    .filter((entity) => entity.name?.toLowerCase().includes(searchTerm.toLowerCase()))
+    .filter(
+      (entity) =>
+        entity.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        entity.ownerName?.toLowerCase().includes(searchTerm.toLowerCase()),
+    )
     .filter((entity) => !filterEntityIds || filterEntityIds.includes(entity.entity_id));
 
   return (
@@ -65,7 +70,7 @@ export const EntityList = ({
           {headerPanel}
           <input
             type="text"
-            placeholder="Search by name..."
+            placeholder="Search by name or owner..."
             value={searchTerm}
             onChange={(e) => {
               setSearchTerm(e.target.value);
@@ -76,19 +81,22 @@ export const EntityList = ({
             className="w-full p-2 mb-2 bg-gold/10 border border-gold/20 rounded text-gold placeholder-gold/50 focus:outline-none focus:border-gold/40"
           />
           <ul>
-            {filteredList.map((entity, index) => (
+            {filteredList.map((entity) => (
               <li
                 className={clsx("py-2 px-2 bg-gold/20 hover:bg-crimson/40 my-1 rounded border border-gold/10", {
                   "animate-pulse pointer-events-none": questing || entity.id === Number(DUMMY_HYPERSTRUCTURE_ENTITY_ID),
                 })}
-                key={index}
+                key={entity.id}
                 onClick={() => setSelectedEntity(entity)}
               >
                 <div className="flex flex-col space-y-2">
                   <div className="flex flex-row justify-between items-center">
-                    <div className="flex flex-row space-x-1 items-center">
-                      {entity?.position && <ViewOnMapIcon className={"my-auto"} position={entity.position} />}
+                    <div className="flex flex-row space-x-5 items-center">
                       <h5>{entity.name}</h5>
+                      <div className="flex flex-row ">
+                        {entity?.position && <ViewOnMapIcon className={"my-auto"} position={entity.position} />}
+                        {entity?.position && <NavigateToPositionIcon className="h-6 w-6" position={entity?.position} />}
+                      </div>
                     </div>
                     <ArrowRight className="w-2 fill-current" />
                   </div>

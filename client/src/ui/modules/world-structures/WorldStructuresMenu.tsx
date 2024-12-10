@@ -1,26 +1,23 @@
-import { useDojo } from "@/hooks/context/DojoContext";
-import { EntityList } from "@/ui/components/list/EntityList";
-import { currencyFormat, currencyIntlFormat, divideByPrecision } from "@/ui/utils/utils";
-import { useMemo, useState } from "react";
-import { Tabs } from "../../elements/tab";
-
-import { FragmentMinePanel } from "@/ui/components/fragmentMines/FragmentMinePanel";
-import { HyperstructurePanel } from "@/ui/components/hyperstructures/HyperstructurePanel";
-
-import { useFragmentMines } from "@/hooks/helpers/useFragmentMines";
-import { useHyperstructureProgress, useHyperstructures } from "@/hooks/helpers/useHyperstructures";
-
 import { LeaderboardManager } from "@/dojo/modelManager/LeaderboardManager";
+import { useDojo } from "@/hooks/context/DojoContext";
 import { getArmiesByPosition } from "@/hooks/helpers/useArmies";
 import { useGetHyperstructuresWithContributionsFromPlayer } from "@/hooks/helpers/useContributions";
 import { useEntitiesUtils } from "@/hooks/helpers/useEntities";
+import { useFragmentMines } from "@/hooks/helpers/useFragmentMines";
 import { useGuilds } from "@/hooks/helpers/useGuilds";
+import { useHyperstructureProgress, useHyperstructures } from "@/hooks/helpers/useHyperstructures";
 import { useResourceBalance } from "@/hooks/helpers/useResources";
+import { FragmentMinePanel } from "@/ui/components/fragmentMines/FragmentMinePanel";
 import { HintSection } from "@/ui/components/hints/HintModal";
+import { HyperstructurePanel } from "@/ui/components/hyperstructures/HyperstructurePanel";
+import { EntityList } from "@/ui/components/list/EntityList";
 import { Checkbox } from "@/ui/elements/Checkbox";
 import { HintModalButton } from "@/ui/elements/HintModalButton";
 import { ResourceIcon } from "@/ui/elements/ResourceIcon";
+import { currencyFormat, currencyIntlFormat, divideByPrecision } from "@/ui/utils/utils";
 import { BattleSide, ContractAddress, findResourceById, ID, ResourcesIds } from "@bibliothecadao/eternum";
+import { useMemo, useState } from "react";
+import { Tabs } from "../../elements/tab";
 
 export const WorldStructuresMenu = ({ className }: { className?: string }) => {
   const {
@@ -78,6 +75,7 @@ export const WorldStructuresMenu = ({ className }: { className?: string }) => {
               panel={({ entity }) => <HyperstructurePanel entity={entity} />}
               entityContent={hyperstructureExtraContent}
               list={hyperstructures
+                .filter((hyperstructure) => hyperstructure.created_at)
                 .sort((a, b) => Number(a.entity_id) - Number(b.entity_id))
                 .map((hyperstructure) => ({
                   id: hyperstructure.entity_id,
@@ -244,24 +242,32 @@ const HyperStructureExtraContent = ({
   x: number;
   y: number;
 }) => {
+  const dojo = useDojo();
   const {
     account: { account },
-  } = useDojo();
+  } = dojo;
 
   const progress = useHyperstructureProgress(hyperstructureEntityId);
+
+  const latestChangeEvent = LeaderboardManager.instance(dojo).getCurrentCoOwners(hyperstructureEntityId);
+
+  const needTosetCoOwners = !latestChangeEvent && progress.percentage === 100;
 
   return (
     <BaseStructureExtraContent x={x} y={y} entityId={hyperstructureEntityId}>
       <div className="flex items-center gap-2">
         <span className="text-gold/80">Progress:</span>
         <span className="font-medium">{`${progress.percentage}%`}</span>
+        {needTosetCoOwners && <div className="text-xs text-red animate-pulse">Co-owners not set</div>}
       </div>
       <div className="flex items-center gap-2">
         <span className="text-gold/80">Shares:</span>
         <span className="font-medium">
           {currencyIntlFormat(
-            (LeaderboardManager.instance().getAddressShares(ContractAddress(account.address), hyperstructureEntityId) ||
-              0) * 100,
+            (LeaderboardManager.instance(dojo).getAddressShares(
+              ContractAddress(account.address),
+              hyperstructureEntityId,
+            ) || 0) * 100,
             0,
           )}
           %

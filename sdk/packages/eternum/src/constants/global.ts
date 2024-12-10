@@ -29,9 +29,9 @@ export const BUILDING_FIXED_COST_SCALE_PERCENT = 5_000; // 5_000/10_000 = 50%
 
 // ----- Hyperstructures ----- //
 export const HYPERSTRUCTURE_POINTS_PER_CYCLE = 7;
-export const HYPERSTRUCTURE_POINTS_ON_COMPLETION = 40_000;
+export const HYPERSTRUCTURE_POINTS_ON_COMPLETION = 500_000;
 export const HYPERSTRUCTURE_TIME_BETWEEN_SHARES_CHANGE_S = 17280; // 2 days
-export const HYPERSTRUCTURE_POINTS_FOR_WIN = 6_320_000;
+export const HYPERSTRUCTURE_POINTS_FOR_WIN = 9_620_000;
 
 // ----- Entity Types ----- //
 export const DONKEY_ENTITY_TYPE = 256;
@@ -74,7 +74,7 @@ export const ARMIES_TICK_INTERVAL_SECONDS = 3600;
 
 // ----- Speed ----- //
 // @dev: Seconds per km
-export const DONKEY_SPEED = 24;
+export const DONKEY_SPEED = 9;
 
 // @TODO: Deprecate this constant everywhere
 export const ARMY_SPEED = 1;
@@ -108,8 +108,8 @@ export const MERCENARIES_PALADINS_LOWER_BOUND = 1_000;
 export const MERCENARIES_PALADINS_UPPER_BOUND = 4_000;
 export const MERCENARIES_CROSSBOWMEN_LOWER_BOUND = 1_000;
 export const MERCENARIES_CROSSBOWMEN_UPPER_BOUND = 4_000;
-export const MERCENARIES_WHEAT_REWARD = 100;
-export const MERCENARIES_FISH_REWARD = 200;
+export const MERCENARIES_WHEAT_REWARD = 0;
+export const MERCENARIES_FISH_REWARD = 0;
 
 // ----- Settlement ----- //
 export const SETTLEMENT_CENTER = 2147483646;
@@ -131,16 +131,14 @@ export const VELORDS_FEE_ON_DEPOSIT = 400; // 4%
 export const VELORDS_FEE_ON_WITHDRAWAL = 400; // 4%
 export const SEASON_POOL_FEE_ON_DEPOSIT = 400; // 4%
 export const SEASON_POOL_FEE_ON_WITHDRAWAL = 400; // 4%
-export const CLIENT_FEE_ON_DEPOSIT = 2; // 2%
-export const CLIENT_FEE_ON_WITHDRAWAL = 2; // 2%
+export const CLIENT_FEE_ON_DEPOSIT = 200; // 2%
+export const CLIENT_FEE_ON_WITHDRAWAL = 200; // 2%
 export const VELORDS_FEE_RECIPIENT = "0x045c587318c9ebcf2fbe21febf288ee2e3597a21cd48676005a5770a50d433c5";
 export const SEASON_POOL_FEE_RECIPIENT = "0x1a3e37c77be7de91a9177c6b57956faa6da25607e567b10a25cf64fea5e533b";
 export const MAX_BANK_FEE_ON_DEPOSIT = 0; // 10%
 export const MAX_BANK_FEE_ON_WITHDRAWAL = 0; // 10%
 
-// TODO: CHECKLIST
-// - [ ] Check if this is correct
-export const SEASON_START_AFTER_SECONDS = 60 * 60 * 24 * 7; // 7 days
+export const SEASON_START_AFTER_SECONDS = 60 * 60 * 26; // 1 day
 export const SEASON_BRIDGE_CLOSE_AFTER_END_SECONDS = 48 * 60 * 60; // 2 days
 
 export const EternumGlobalConfig: Config = {
@@ -188,7 +186,7 @@ export const EternumGlobalConfig: Config = {
   carryCapacityGram: {
     [CapacityConfigCategory.None]: 0,
     [CapacityConfigCategory.Structure]: BigInt(2) ** BigInt(128) - BigInt(1),
-    [CapacityConfigCategory.Donkey]: 400_000,
+    [CapacityConfigCategory.Donkey]: 4_000_000,
     [CapacityConfigCategory.Army]: 10_000,
     [CapacityConfigCategory.Storehouse]: 300_000_000,
   },

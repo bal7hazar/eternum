@@ -1,26 +1,29 @@
-import { LeaderboardManager } from "@/dojo/modelManager/LeaderboardManager";
 import { Player } from "@bibliothecadao/eternum";
 import { getComponentValue, Has, HasValue, runQuery } from "@dojoengine/recs";
 import { shortString } from "starknet";
 import { useDojo } from "../context/DojoContext";
 import { useEntitiesUtils } from "./useEntities";
 
-import { PRIZE_POOL_PLAYERS } from "@/ui/constants";
 import { calculateLordsShare, calculatePlayerSharePercentage } from "@/ui/utils/leaderboard";
 import { StructureType } from "@bibliothecadao/eternum";
+import { formatEther } from "viem";
+import { useLeaderBoardStore } from "../store/useLeaderBoardStore";
+import { usePrizePool } from "./use-rewards";
 
 export const useGetAllPlayers = () => {
+  const dojo = useDojo();
+
   const {
     setup: {
       components: { Realm, Owner, GuildMember, AddressName, Hyperstructure, Structure },
     },
-  } = useDojo();
-  const nextBlockTimestamp = Math.floor(Date.now() / 1000);
-
+  } = dojo;
   const { getEntityName } = useEntitiesUtils();
+  const playersByRank = useLeaderBoardStore((state) => state.playersByRank);
+
+  const prizePool = usePrizePool();
 
   const playerEntities = runQuery([Has(AddressName)]);
-  const playersByRank = LeaderboardManager.instance().getPlayersByRank(nextBlockTimestamp || 0);
 
   const totalPoints = playersByRank.reduce((sum, [, points]) => sum + points, 0);
 
@@ -58,7 +61,7 @@ export const useGetAllPlayers = () => {
         points,
         rank: rankIndex === -1 ? Number.MAX_SAFE_INTEGER : rankIndex + 1,
         percentage: calculatePlayerSharePercentage(points, totalPoints),
-        lords: calculateLordsShare(points, totalPoints, PRIZE_POOL_PLAYERS),
+        lords: calculateLordsShare(points, totalPoints, Number(formatEther(prizePool))),
         realms: runQuery([Has(Realm), HasValue(Owner, { address: player.address })]).size,
         mines: runQuery([
           HasValue(Structure, { category: StructureType[StructureType.FragmentMine] }),
@@ -66,7 +69,7 @@ export const useGetAllPlayers = () => {
         ]).size,
         hyperstructures: runQuery([Has(Hyperstructure), HasValue(Owner, { address: player.address })]).size,
         isAlive: player.isAlive,
-        guildName: player.guildName,
+        guildName: player.guildName || "",
       };
     });
   };
