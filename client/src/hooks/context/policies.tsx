@@ -1,5 +1,9 @@
 export const policies = [
   {
+    target: "0x023cc88996A5f9C7BCb559FdCFFC257C0f75aBe60F2a7E5d5CD343F8a95967F7",
+    method: "set_approval_for_all",
+  },
+  {
     target: "0x7cf2ac5934ac799d7307178567207c4e3a361ab1cf2218d7c5ad0b9f5da7e25",
     method: "dojo_name",
   },

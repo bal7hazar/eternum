@@ -1,6 +1,7 @@
 import { useRpcProvider } from "@/hooks/context/DojoContext";
 import clsx from "clsx";
 import { useCallback, useEffect, useState } from "react";
+import { AddTroops } from "./scripts/add-troops";
 import { Build } from "./scripts/build";
 import { CreateArmies } from "./scripts/create-armies";
 import { Print } from "./scripts/print";
@@ -51,6 +52,7 @@ export const Scripts = () => {
         <Skip />
         <Build />
         <CreateArmies />
+        <AddTroops />
       </div>
     </div>
   );
