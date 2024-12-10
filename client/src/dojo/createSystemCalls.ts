@@ -38,6 +38,10 @@ export function createSystemCalls({ provider }: SetupNetworkResult) {
     await provider.send_resources(props);
   };
 
+  const sends_resources = async (props: SystemProps.SendResourcesProps[]) => {
+    await provider.sends_resources(props);
+  };
+
   const send_resources_multiple = async (props: SystemProps.SendResourcesMultipleProps) => {
     await provider.send_resources_multiple(props);
   };
@@ -261,6 +265,7 @@ export function createSystemCalls({ provider }: SetupNetworkResult) {
 
   const systemCalls = {
     send_resources,
+    sends_resources,
     send_resources_multiple,
     pickup_resources,
     remove_liquidity,

@@ -799,6 +799,19 @@ export class EternumProvider extends EnhancedDojoProvider {
     return await this.promiseQueue.enqueue(call);
   }
 
+  public async sends_resources(props: SystemProps.SendResourcesProps[]) {
+    const { signer } = props[0];
+    const calldata: { contractAddress: string; entrypoint: string; calldata: BigNumberish[] }[] = [];
+    props.forEach(({ sender_entity_id, recipient_entity_id, resources }) => {
+      calldata.push({
+        contractAddress: getContractByName(this.manifest, `${NAMESPACE}-resource_systems`),
+        entrypoint: "send",
+        calldata: [sender_entity_id, recipient_entity_id, resources.length / 2, ...resources],
+      });
+    });
+    return await this.executeAndCheckTransaction(signer, calldata);
+  }
+
   /**
    * Send resources from multiple entities
    *

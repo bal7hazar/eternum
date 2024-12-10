@@ -8,6 +8,7 @@ import { CreateArmies } from "./scripts/create-armies";
 import { Print } from "./scripts/print";
 import { Show } from "./scripts/show";
 import { Skip } from "./scripts/skip";
+import { Transfers } from "./scripts/transfers";
 
 const SEASON_START_TIMESTAMP = 1733921925;
 
@@ -61,11 +62,13 @@ export const Scripts = () => {
           </div>
         </div>
         <Print />
+        {/* <Autopickup /> */}
         <Show />
         <Skip />
         <Build />
         <CreateArmies />
         <AddTroops />
+        <Transfers />
       </div>
     </div>
   );

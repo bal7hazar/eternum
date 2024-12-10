@@ -4,6 +4,7 @@ import { create } from "zustand";
 export interface Transfer {
   from: number;
   to: number;
+  resource: string;
   amount: number;
   start: number;
   end: number;
@@ -27,6 +28,8 @@ interface ScriptStore {
   transfers: { items: Transfer[] };
   setTransfers: (transfers: { items: Transfer[] }) => void;
   resetTransfers: () => void;
+  autopickup: boolean;
+  setAutopickup: (autopickup: boolean) => void;
 }
 
 const useScriptStore = create<ScriptStore>((set) => ({
@@ -46,6 +49,9 @@ const useScriptStore = create<ScriptStore>((set) => ({
   transfers: { items: [] as Transfer[] },
   setTransfers: (transfers) => set({ transfers }),
   resetTransfers: () => set({ transfers: { items: [] } }),
+  autopickup: false,
+  setAutopickup: (autopickup) => set({ autopickup }),
 }));
 
 export default useScriptStore;
+
