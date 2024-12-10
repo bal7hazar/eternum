@@ -1,4 +1,5 @@
 import { useRpcProvider } from "@/hooks/context/DojoContext";
+import { useUserBattles } from "@/hooks/helpers/battles/useBattles";
 import clsx from "clsx";
 import { useCallback, useEffect, useState } from "react";
 import { AddTroops } from "./scripts/add-troops";
@@ -14,6 +15,8 @@ export const Scripts = () => {
   const [unfolded, setUnfolded] = useState(true);
   const [trigger, setTrigger] = useState(false);
   const provider = useRpcProvider();
+
+  const battles = useUserBattles();
 
   const getTimestamp = useCallback(async () => {
     const block = await provider.getBlock();
@@ -45,8 +48,18 @@ export const Scripts = () => {
         {unfolded ? "-" : "+"}
       </div>
       <div className={clsx("relative text-black px-2 flex flex-col gap-y-2", unfolded ? "block" : "hidden")}>
-        <div className={clsx("h-2 w-2 rounded-full absolute top-0 right-0 animate-ping", trigger ? "bg-green" : "bg-red")} />
-        <div className={clsx("h-2 w-2 rounded-full absolute top-0 right-0", trigger ? "bg-green" : "bg-red")} />
+        <div className="flex flex-col justify-end absolute top-0 right-0 gap-y-px pr-4">
+          <div className="relative">
+            <div className="text-xs mr-6">Start:</div>
+            <div className={clsx("h-2 w-2 rounded-full animate-ping absolute top-1/4 right-0", trigger ? "bg-green" : "bg-red")} />
+            <div className={clsx("h-2 w-2 rounded-full absolute top-1/4 right-0", trigger ? "bg-green" : "bg-red")} />
+          </div>
+          <div className="relative">
+            <div className="text-xs mr-6">Battles:</div>
+            <div className={clsx("h-2 w-2 rounded-full animate-ping absolute top-1/4 right-0", battles.length === 0 ? "bg-green" : "bg-red")} />
+            <div className={clsx("h-2 w-2 rounded-full absolute top-1/4 right-0", battles.length === 0 ? "bg-green" : "bg-red")} />
+          </div>
+        </div>
         <Print />
         <Show />
         <Skip />
