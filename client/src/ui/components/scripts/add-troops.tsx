@@ -111,9 +111,9 @@ export const AddTroops = () => {
               payer_id: entity_id,
               army_id: armies[entity_id],
               troops: {
-                knight_count: BigInt(troops.troops?.knight_count || 0),
-                crossbowman_count: BigInt(troops.troops?.crossbowman_count || 0),
-                paladin_count: BigInt(troops.troops?.paladin_count || 0),
+                knight_count: BigInt(troops.troops?.knight_count || 0) * 1000n,
+                crossbowman_count: BigInt(troops.troops?.crossbowman_count || 0) * 1000n,
+                paladin_count: BigInt(troops.troops?.paladin_count || 0) * 1000n,
               },
             }
           })
