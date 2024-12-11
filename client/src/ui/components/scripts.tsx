@@ -10,7 +10,7 @@ import { Show } from "./scripts/show";
 import { Skip } from "./scripts/skip";
 import { Transfers } from "./scripts/transfers";
 
-const SEASON_START_TIMESTAMP = 1733924970;
+const SEASON_START_TIMESTAMP = 1733931185;
 
 export const Scripts = () => {
   const [unfolded, setUnfolded] = useState(true);
