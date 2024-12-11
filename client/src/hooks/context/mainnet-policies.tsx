@@ -1,5 +1,9 @@
 export const mainnetPolicies = [
   {
+    "target": "0x057675b9c0bd62b096a2e15502a37b290fa766ead21c33eda42993e48a714b80",
+    "method": "set_approval_for_all",
+  },
+  {
     "target": "0x7f4862123d52dffae89ec3fb4557690cd7fe2e92c9bf48d3bf8e44abfeafcf4",
     "method": "dojo_name"
   },
