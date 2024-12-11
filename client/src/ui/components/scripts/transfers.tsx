@@ -50,10 +50,11 @@ export const Transfers = () => {
         const calls = transfers.items
           .filter(({ start, end, every }, index) => {
             const condition = timestamp >= start && timestamp <= end && timestamp > (times[index] || 0);
-            if (condition) {
+            const noset = start == undefined && end == undefined && every == undefined && times[index] == undefined;
+            if (condition || noset) {
               times[index] = timestamp + every;
             }
-            return condition;
+            return condition || noset;
           })
           .map(({ from, to, resource, amount }: Transfer) => {
             const resourceId = ResourcesIds[resource as keyof typeof ResourcesIds];

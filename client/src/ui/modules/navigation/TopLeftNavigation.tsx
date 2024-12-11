@@ -21,7 +21,7 @@ import { getComponentValue } from "@dojoengine/recs";
 import { getEntityIdFromKeys } from "@dojoengine/utils";
 import { motion } from "framer-motion";
 import { Crown, EyeIcon, Landmark, Pickaxe, ShieldQuestion, Sparkles, Star } from "lucide-react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { QuestsMenu } from "./QuestMenu";
 import { SecondaryMenuItems } from "./SecondaryMenuItems";
 
@@ -94,7 +94,7 @@ const WorkersHutTooltipContent = () => {
   );
 };
 
-export const TopLeftNavigation = () => {
+export const TopLeftNavigation = memo(() => {
   const { shows } = useScriptStore();
   const { setup } = useDojo();
 
