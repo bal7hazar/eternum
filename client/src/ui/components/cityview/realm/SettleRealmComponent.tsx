@@ -29,10 +29,10 @@ const SettleRealmComponent = ({ setSettledRealmId }: { setSettledRealmId: (id: n
   const settleRealms = async (realmIds: number[]) => {
     setLoading(true);
     try {
-      const res = await create_multiple_realms({
+      await create_multiple_realms({
         realm_ids: realmIds,
         owner: account.address,
-        frontend: env.VITE_CLIENT_FEE_RECIPIENT,
+        frontend: env.VITE_PUBLIC_CLIENT_FEE_RECIPIENT,
         signer: account,
         season_pass_address: env.VITE_SEASON_PASS_ADDRESS,
       });
@@ -165,7 +165,7 @@ export const SeasonPassRealm = ({
   return (
     <div
       key={seasonPassRealm.realmId}
-      className={`flex flex-col gap-2 p-2 rounded-md bg-gold/10 transition-colors duration-200 border border-2 ${
+      className={`flex flex-col gap-2 p-2 rounded-md bg-gold/10 transition-colors duration-200 border ${
         selected ? "border-gold bg-gold/30" : "border-transparent"
       } ${className} hover:border-gold`}
       onClick={() => setSelected(!selected)}

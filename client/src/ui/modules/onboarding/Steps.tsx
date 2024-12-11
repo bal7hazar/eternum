@@ -100,10 +100,10 @@ export const SettleRealm = ({ onPrevious }: { onPrevious: () => void }) => {
   const settleRealms = async (realmIds: number[]) => {
     setLoading(true);
     try {
-      const res = await create_multiple_realms({
+      await create_multiple_realms({
         realm_ids: realmIds,
         owner: account.address,
-        frontend: env.VITE_CLIENT_FEE_RECIPIENT,
+        frontend: env.VITE_PUBLIC_CLIENT_FEE_RECIPIENT,
         signer: account,
         season_pass_address: env.VITE_SEASON_PASS_ADDRESS,
       });
@@ -178,7 +178,7 @@ export const SettleRealm = ({ onPrevious }: { onPrevious: () => void }) => {
       transition={{ type: "ease-in-out", stiffness: 3, duration: 0.2 }}
     >
       <div
-        className={`backdrop-blur-lg bg-black/20 self-center border-[0.5px] border-gradient rounded-lg text-gold w-full overflow-hidden relative z-50 backdrop-filter backdrop-blur-[24px] ${size} 
+        className={`bg-black/20 self-center border-[0.5px] border-gradient rounded-lg text-gold w-full overflow-hidden relative z-50 backdrop-filter backdrop-blur-[24px] ${size} 
 		shadow-[0_4px_4px_0_rgba(0,0,0,0.25)] p-8`}
       >
         <div className="relative flex flex-col gap-6 min-h-full h-full max-h-full">
