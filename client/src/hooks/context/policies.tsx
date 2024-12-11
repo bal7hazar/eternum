@@ -1,6 +1,6 @@
 export const policies = [
   {
-    target: "0x023cc88996A5f9C7BCb559FdCFFC257C0f75aBe60F2a7E5d5CD343F8a95967F7",
+    target: "0x057675b9c0bd62b096a2e15502a37b290fa766ead21c33eda42993e48a714b80",
     method: "set_approval_for_all",
   },
   {
