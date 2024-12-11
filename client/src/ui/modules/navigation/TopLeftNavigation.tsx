@@ -147,6 +147,7 @@ export const TopLeftNavigation = () => {
   const goToHexView = (entityId: ID) => {
     const structure = structures.find((structure) => structure.entity_id === entityId);
     const url = new Position(structure!.position).toHexLocationUrl();
+    setPreviewBuilding(null);
     handleUrlChange(url);
   };
 
@@ -158,9 +159,7 @@ export const TopLeftNavigation = () => {
     if (!newPosition) throw new Error("No position found!");
 
     const url = new Position({ x: newPosition.x, y: newPosition.y }).toMapLocationUrl();
-
     setPreviewBuilding(null);
-
     handleUrlChange(url);
   };
 
