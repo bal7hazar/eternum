@@ -1,3 +1,5 @@
+import { addToSubscription } from "@/dojo/queries";
+import { useDojo } from "@/hooks/context/DojoContext";
 import { useGuilds } from "@/hooks/helpers/useGuilds";
 import { useQuery } from "@/hooks/helpers/useQuery";
 import {
@@ -11,7 +13,7 @@ import { BaseThreeTooltip, Position } from "@/ui/elements/BaseThreeTooltip";
 import { Headline } from "@/ui/elements/Headline";
 import { formatTime } from "@/ui/utils/utils";
 import { ContractAddress } from "@bibliothecadao/eternum";
-import { memo, useMemo } from "react";
+import { memo, useMemo, useState } from "react";
 import useUIStore from "../../../../hooks/store/useUIStore";
 import { StructureListItem } from "./StructureListItem";
 
@@ -35,14 +37,31 @@ export const ImmunityTimer = ({
 };
 
 export const StructureInfoLabel = memo(() => {
+  const { setup } = useDojo();
   const { isMapView } = useQuery();
   const hoveredStructure = useUIStore((state) => state.hoveredStructure);
   const { getStructureByEntityId } = useStructures();
   const { getGuildFromPlayerAddress } = useGuilds();
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const structure = useMemo(() => {
     if (hoveredStructure) {
       const structure = getStructureByEntityId(hoveredStructure.entityId);
+
+      const fetch = async () => {
+        setIsLoading(true);
+        await addToSubscription(
+          setup.network.toriiClient,
+          setup.network.contractComponents as any,
+          hoveredStructure.entityId.toString(),
+          { x: 0, y: 0 },
+        );
+        setIsLoading(false);
+      };
+
+      fetch();
+
       return structure;
     }
     return undefined;
@@ -59,9 +78,14 @@ export const StructureInfoLabel = memo(() => {
     <>
       {structure && isMapView && (
         <BaseThreeTooltip position={Position.CLEAN} className={`pointer-events-none w-[350px]`}>
-          <div className="flex flex-col gap-1">
-            <Headline className="text-center text-lg">
-              <div>{structure.ownerName}</div>
+          {isLoading ? (
+            <div className="flex justify-center items-center h-full">
+              <div className="text-gold">Loading...</div>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-1">
+              <Headline className="text-center text-lg">
+                <div>{structure.ownerName}</div>
               {playerGuild && (
                 <div>
                   {"< "}
@@ -77,7 +101,8 @@ export const StructureInfoLabel = memo(() => {
               maxInventory={3}
             />
             <ImmunityTimer isImmune={isImmune} timer={timer} />
-          </div>
+            </div>
+          )}
         </BaseThreeTooltip>
       )}
     </>
