@@ -172,7 +172,7 @@ export class ArmyManager {
     const [startRow, startCol] = chunkKey.split(",").map(Number);
     this.visibleArmies = this.getVisibleArmiesForChunk(startRow, startCol);
 
-    // Reset all model instances
+    // Reset all model instances.
     this.armyModel.resetInstanceCounts();
 
     let currentCount = 0;
