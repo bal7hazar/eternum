@@ -66,47 +66,39 @@ export const addToSubscription = async <S extends Schema>(
     },
   };
 
-  position &&
-    (await getEntities(
-      client,
-      {
-        ...positionClause,
-      },
-      components,
-      10_000,
-      false,
-    ));
-
   await getEntities(
     client,
     {
-      Keys: {
-        keys: [entityID],
-        pattern_matching: "VariableLen",
-        models: [],
+      Composite: {
+        operator: "Or",
+        clauses: [
+          positionClause,
+          {
+            Keys: {
+              keys: [entityID],
+              pattern_matching: "FixedLen",
+              models: [],
+            },
+          },
+          {
+            Keys: {
+              keys: [entityID, undefined],
+              pattern_matching: "FixedLen",
+              models: [],
+            },
+          },
+          {
+            Keys: {
+              keys: [entityID, undefined, undefined],
+              pattern_matching: "FixedLen",
+              models: [],
+            },
+          },
+        ],
       },
     },
     components,
     20_000,
-    false,
-  );
-};
-
-export const addMarketSubscription = async <S extends Schema>(
-  client: ToriiClient,
-  components: Component<S, Metadata, undefined>[],
-) => {
-  await getEntities(
-    client,
-    {
-      Keys: {
-        keys: [undefined, undefined],
-        pattern_matching: "FixedLen",
-        models: ["s0_eternum-DetachedResource"],
-      },
-    },
-    components,
-    50_000,
     false,
   );
 };
