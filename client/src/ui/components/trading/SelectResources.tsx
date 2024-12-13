@@ -78,7 +78,6 @@ export const SelectResources = ({
               </Button>
             )}
             <ListSelect
-              className="overflow-hidden"
               options={options}
               value={selectedResourceIds[index]}
               onChange={(value) => {
