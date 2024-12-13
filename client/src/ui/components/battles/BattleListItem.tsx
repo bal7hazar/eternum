@@ -80,8 +80,8 @@ export const BattleListItem = ({ battle, ownArmySelected, showCompass = false }:
     );
 
     if (ownArmySelected && isBattleOngoing) {
-      // join battle
-      return [swordButton];
+      // join battle.
+      return [swordButton,];
     } else {
       // just check
       return [eyeButton];
