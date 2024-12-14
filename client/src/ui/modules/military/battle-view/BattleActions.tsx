@@ -151,19 +151,20 @@ export const BattleActions = ({
 
   const handleBattleClaim = async () => {
     setLoading(Loading.Claim);
+    const structureId = structure?.entity_id || 999999998n; // Bank
     try {
       if (battleAdjusted?.entity_id! !== 0 && battleAdjusted?.entity_id === selectedArmy!.battle_id) {
         await battle_leave_and_claim({
           signer: account,
           army_id: selectedArmy!.entity_id,
           battle_id: battleManager?.battleEntityId || 0,
-          structure_id: structure!.entity_id,
+          structure_id: structureId,
         });
       } else {
         await battle_claim({
           signer: account,
           army_id: selectedArmy!.entity_id,
-          structure_id: structure!.entity_id,
+          structure_id: structureId,
         });
       }
     } catch (error) {
