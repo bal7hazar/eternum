@@ -320,7 +320,7 @@ export const BattleActions = ({
             className="flex flex-col gap-2 h-full border-0 justify-center"
             isLoading={loading === Loading.Claim}
             onClick={handleBattleClaim}
-            disabled={loading !== Loading.None || claimStatus !== ClaimStatus.Claimable}
+            // disabled={loading !== Loading.None || claimStatus !== ClaimStatus.Claimable}
           >
             <Castle className="w-12 h-12" />
             <div className="text-xl text-white/80">Claim</div>
