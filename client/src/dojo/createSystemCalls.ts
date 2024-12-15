@@ -166,6 +166,10 @@ export function createSystemCalls({ provider }: SetupNetworkResult) {
     await provider.contribute_to_construction(props);
   };
 
+  const contributes_to_construction = async (props: SystemProps.ContributeToConstructionProps[]) => {
+    await provider.contributes_to_construction(props);
+  };
+
   const set_access = async (props: SystemProps.SetAccessProps) => {
     await provider.set_access(props);
   };
@@ -301,6 +305,7 @@ export function createSystemCalls({ provider }: SetupNetworkResult) {
 
     create_hyperstructure,
     contribute_to_construction,
+    contributes_to_construction,
     set_access,
     set_co_owners,
     get_points,

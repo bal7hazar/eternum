@@ -2269,6 +2269,19 @@ export class EternumProvider extends EnhancedDojoProvider {
     return await this.promiseQueue.enqueue(call);
   }
 
+  public async contributes_to_construction(props: SystemProps.ContributeToConstructionProps[]) {
+    const { signer } = props[0];
+    const calldata: { contractAddress: string; entrypoint: string; calldata: any }[] = [];
+    props.forEach(({ hyperstructure_entity_id, contributor_entity_id, contributions }) => {
+      calldata.push({
+        contractAddress: getContractByName(this.manifest, `${NAMESPACE}-resource_systems`),
+        entrypoint: "contribute_to_construction",
+        calldata: [hyperstructure_entity_id, contributor_entity_id, contributions],
+      });
+    });
+    return await this.promiseQueue.enqueue(this.createProviderCall(signer, calldata));
+  }
+
   public async set_access(props: SystemProps.SetAccessProps) {
     const { hyperstructure_entity_id, access, signer } = props;
 
