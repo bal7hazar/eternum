@@ -2274,7 +2274,7 @@ export class EternumProvider extends EnhancedDojoProvider {
     const calldata: { contractAddress: string; entrypoint: string; calldata: any }[] = [];
     props.forEach(({ hyperstructure_entity_id, contributor_entity_id, contributions }) => {
       calldata.push({
-        contractAddress: getContractByName(this.manifest, `${NAMESPACE}-resource_systems`),
+        contractAddress: getContractByName(this.manifest, `${NAMESPACE}-hyperstructure_systems`),
         entrypoint: "contribute_to_construction",
         calldata: [hyperstructure_entity_id, contributor_entity_id, contributions],
       });
