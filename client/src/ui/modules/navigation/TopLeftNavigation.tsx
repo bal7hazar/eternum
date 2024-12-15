@@ -2,7 +2,6 @@ import { configManager } from "@/dojo/setup";
 import { useDojo } from "@/hooks/context/DojoContext";
 import { useEntities, useEntitiesUtils } from "@/hooks/helpers/useEntities";
 import { useQuery } from "@/hooks/helpers/useQuery";
-import { useUnclaimedQuestsCount } from "@/hooks/helpers/useQuests";
 import useScriptStore from "@/hooks/store/useScriptStore";
 import useUIStore from "@/hooks/store/useUIStore";
 import useNextBlockTimestamp from "@/hooks/useNextBlockTimestamp";
@@ -98,7 +97,6 @@ export const TopLeftNavigation = () => {
   const { shows } = useScriptStore();
   const { setup } = useDojo();
 
-  const { unclaimedQuestsCount } = useUnclaimedQuestsCount();
   const { isMapView, handleUrlChange, hexPosition } = useQuery();
   const { playerStructures } = useEntities();
   const { getEntityInfo } = useEntitiesUtils();
@@ -324,15 +322,11 @@ export const TopLeftNavigation = () => {
       </motion.div>
       <div className="relative">
         <SecondaryMenuItems />
-        {unclaimedQuestsCount > 0 && (
-          <div className="absolute right-0 px-4 top-full mt-2">
-            <QuestsMenu unclaimedQuestsCount={unclaimedQuestsCount} />
-          </div>
-        )}
+        <QuestsMenu />
       </div>
     </div>
   );
-});
+};
 
 TopLeftNavigation.displayName = "TopLeftNavigation";
 
