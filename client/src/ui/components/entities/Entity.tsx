@@ -30,6 +30,9 @@ type EntityProps = {
   arrival: ArrivalInfo;
 } & React.HTMLAttributes<HTMLDivElement>;
 
+const CACHE_KEY = "inventory-resources-sync";
+const CACHE_DURATION = 2 * 60 * 1000; // 2 minutes in milliseconds
+
 export const EntityArrival = ({ arrival, ...props }: EntityProps) => {
   const dojo = useDojo();
 
@@ -50,6 +53,14 @@ export const EntityArrival = ({ arrival, ...props }: EntityProps) => {
 
   useEffect(() => {
     if (entityResources.length === 0) {
+      const cacheKey = `${CACHE_KEY}-${arrival.entityId}`;
+      const cachedTime = localStorage.getItem(cacheKey);
+      const now = Date.now();
+
+      if (cachedTime && now - parseInt(cachedTime) < CACHE_DURATION) {
+        return;
+      }
+
       setIsSyncing(true);
       const fetch = async () => {
         try {
@@ -58,6 +69,7 @@ export const EntityArrival = ({ arrival, ...props }: EntityProps) => {
             dojo.network.contractComponents as any,
             arrival.entityId.toString(),
           );
+          localStorage.setItem(cacheKey, now.toString());
         } catch (error) {
           console.error("Fetch failed", error);
         } finally {
@@ -78,7 +90,8 @@ export const EntityArrival = ({ arrival, ...props }: EntityProps) => {
         </div>
       ) : (
         <div className="flex ml-auto italic animate-pulse self-center bg-brown/20 rounded-md px-2 py-1">
-          {formatTime(Number(entity.arrivalTime) - nextBlockTimestamp)}
+          Arriving in {formatTime(Number(entity.arrivalTime) - nextBlockTimestamp)} to{" "}
+          {getEntityName(arrival.recipientEntityId)}
         </div>
       )
     ) : null;
@@ -97,6 +110,7 @@ export const EntityArrival = ({ arrival, ...props }: EntityProps) => {
           className="!text-gold"
           type="vertical"
           size="xs"
+          withTooltip={true}
           resourceId={resource.resourceId}
           amount={divideByPrecision(resource.amount)}
         />
