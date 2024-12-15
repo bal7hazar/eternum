@@ -127,6 +127,7 @@ export const BattleView = () => {
   );
 
   const structure = useMemo(() => {
+    console.log("structureId", structureId, structureFromPosition, structureId);
     return battleView?.engage && !battleView?.battleEntityId && !battleView.targetArmy
       ? structureFromPosition
       : structureId;
