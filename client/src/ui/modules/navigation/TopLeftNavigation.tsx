@@ -326,7 +326,7 @@ export const TopLeftNavigation = memo(() => {
       </div>
     </div>
   );
-};
+});
 
 TopLeftNavigation.displayName = "TopLeftNavigation";
 

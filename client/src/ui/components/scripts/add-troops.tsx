@@ -28,6 +28,7 @@ export const useArmies = () => {
         Protectee,
         EntityName,
         Stamina,
+        Structure,
       },
     },
     account: { account },
@@ -53,6 +54,7 @@ export const useArmies = () => {
       Owner,
       Realm,
       Stamina,
+      Structure,
     );
   }, [armies]);
 
