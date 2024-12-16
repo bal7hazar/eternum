@@ -33,7 +33,6 @@ export const Contributions = () => {
   
     const handleSend = async () => {
       if (!contributions || contributions.items.length === 0) return;
-      console.log(contributions);
       const calls: SystemProps.ContributeToConstructionProps[] = contributions.items
         .map(({ from, to, resource, amount }: Transfer) => {
           const resourceId = ResourcesIds[resource as keyof typeof ResourcesIds];
