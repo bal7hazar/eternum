@@ -12,7 +12,7 @@ import { useCallback, useState } from "react";
 
 export const Contributions = () => {
     const { contributions, setContributions, resetContributions } = useScriptStore();
-    const { getBalance, getResourceProductionInfo } = useResourceBalance();
+    const { getBalance } = useResourceBalance();
 
     const [hover, setHover] = useState(false);
     const onMouseEnter = useCallback(() => {
@@ -37,9 +37,7 @@ export const Contributions = () => {
         .map(({ from, to, resource, amount }: Transfer) => {
           const resourceId = ResourcesIds[resource as keyof typeof ResourcesIds];
           const balance = divideByPrecision(getBalance(from, resourceId).balance);
-          const production = getResourceProductionInfo(from, resourceId);
-          const safetyMargin = production !== undefined && production?.consumption_rate !== 0n ? 0.95 : 1
-          const quantity = amount === 0 ? balance * safetyMargin : amount;
+          const quantity = amount === 0 ? balance * 0.95 : amount;
           return {
             signer: account,
             hyperstructure_entity_id: BigInt(to),
