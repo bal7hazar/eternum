@@ -1,8 +1,9 @@
 import { useDojo } from "@/hooks/context/DojoContext";
+import { useResourceBalance } from "@/hooks/helpers/useResources";
 import useScriptStore, { Transfer } from "@/hooks/store/useScriptStore";
 import Button from "@/ui/elements/Button";
 import TextInput from "@/ui/elements/TextInput";
-import { multiplyByPrecision } from "@/ui/utils/utils";
+import { divideByPrecision, multiplyByPrecision } from "@/ui/utils/utils";
 import type * as SystemProps from "@bibliothecadao/eternum";
 import { ResourcesIds } from "@bibliothecadao/eternum";
 import clsx from "clsx";
@@ -11,6 +12,7 @@ import { useCallback, useState } from "react";
 
 export const Contributions = () => {
     const { contributions, setContributions, resetContributions } = useScriptStore();
+    const { getBalance } = useResourceBalance();
 
     const [hover, setHover] = useState(false);
     const onMouseEnter = useCallback(() => {
@@ -35,11 +37,13 @@ export const Contributions = () => {
       const calls: SystemProps.ContributeToConstructionProps[] = contributions.items
         .map(({ from, to, resource, amount }: Transfer) => {
           const resourceId = ResourcesIds[resource as keyof typeof ResourcesIds];
+          const balance = divideByPrecision(getBalance(from, resourceId).balance);
+          const quantity = amount === 0 ? balance : amount;
           return {
             signer: account,
             hyperstructure_entity_id: BigInt(to),
             contributor_entity_id: BigInt(from),
-            contributions: [{ resource: resourceId, amount: multiplyByPrecision(amount) }],
+            contributions: [{ resource: resourceId, amount: multiplyByPrecision(quantity) }],
           }
         });
       setIsLoading(true);
