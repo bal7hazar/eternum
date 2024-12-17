@@ -49,7 +49,7 @@ export const Contributions = () => {
       try {
         await contributes_to_construction(calls);
       } catch (error) {
-        console.error(`Failed to create armies:`, error);
+        console.error(`Failed to create contributions:`, error);
       } finally {
         setIsLoading(false);
       }
