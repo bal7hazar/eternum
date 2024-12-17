@@ -34,10 +34,10 @@ export const Contributions = () => {
     const handleSend = async () => {
       if (!contributions || contributions.items.length === 0) return;
       const calls: SystemProps.ContributeToConstructionProps[] = contributions.items
-        .map(({ from, to, resource, amount }: Transfer) => {
+        .map(({ from, to, resource, amount: fraction }: Transfer) => {
           const resourceId = ResourcesIds[resource as keyof typeof ResourcesIds];
           const balance = divideByPrecision(getBalance(from, resourceId).balance);
-          const quantity = amount === 0 ? balance * 0.95 : amount;
+          const quantity = balance * fraction / 100;
           return {
             signer: account,
             hyperstructure_entity_id: BigInt(to),
