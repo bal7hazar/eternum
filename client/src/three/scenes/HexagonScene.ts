@@ -417,7 +417,7 @@ export abstract class HexagonScene {
       try {
         biome.updateAnimations(deltaTime);
       } catch (error) {
-        console.error("Error updating biome animations:", error);
+        console.error(`Error updating biome animations:`, error);
       }
     });
   }

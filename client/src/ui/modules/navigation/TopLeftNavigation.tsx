@@ -1,6 +1,6 @@
 import { configManager } from "@/dojo/setup";
 import { useDojo } from "@/hooks/context/DojoContext";
-import { useEntities, useEntitiesUtils } from "@/hooks/helpers/useEntities";
+import { PlayerStructure, useEntitiesUtils } from "@/hooks/helpers/useEntities";
 import { useQuery } from "@/hooks/helpers/useQuery";
 import useScriptStore from "@/hooks/store/useScriptStore";
 import useUIStore from "@/hooks/store/useUIStore";
@@ -93,14 +93,12 @@ const WorkersHutTooltipContent = () => {
   );
 };
 
-export const TopLeftNavigation = memo(() => {
-  const { shows } = useScriptStore();
+export const TopLeftNavigation = memo(({ structures }: { structures: PlayerStructure[] }) => {
   const { setup } = useDojo();
+  const { shows } = useScriptStore();
 
   const { isMapView, handleUrlChange, hexPosition } = useQuery();
-  const { playerStructures } = useEntities();
   const { getEntityInfo } = useEntitiesUtils();
-  const structures = playerStructures();
 
   const isSpectatorMode = useUIStore((state) => state.isSpectatorMode);
   const structureEntityId = useUIStore((state) => state.structureEntityId);
@@ -256,11 +254,16 @@ export const TopLeftNavigation = memo(() => {
               className="storehouse-selector px-3 flex gap-2 justify-start items-center text-xxs md:text-sm"
             >
               <ResourceIcon withTooltip={false} resource="Silo" size="sm" />
-              {IS_MOBILE ? (
-                <div className="self-center">{storehouses.quantity.toLocaleString()}</div>
+              {entityInfo.structureCategory !== "Realm" ? (
+                <div className="self-center">∞</div>
               ) : (
                 <div className="self-center">{storehouses.capacityKg.toLocaleString()} kg</div>
               )}
+              {/* {IS_MOBILE ? (
+                <div className="self-center">{storehouses.quantity.toLocaleString()}</div>
+              ) : (
+                <div className="self-center">{storehouses.capacityKg.toLocaleString()} kg</div>
+              )} */}
             </div>
           )}
 
@@ -314,10 +317,7 @@ export const TopLeftNavigation = memo(() => {
               />
             </div>
           </div>
-          <div
-            className="absolute bottom-0 left-0 h-1 bg-gold to-transparent rounded-bl-2xl rounded-tr-2xl mx-1"
-            style={{ width: `${progress}%` }}
-          ></div>
+          <ProgressBar progress={progress} />
         </div>
       </motion.div>
       <div className="relative">
@@ -330,7 +330,18 @@ export const TopLeftNavigation = memo(() => {
 
 TopLeftNavigation.displayName = "TopLeftNavigation";
 
-const TickProgress = () => {
+const ProgressBar = memo(({ progress }: { progress: number }) => {
+  return (
+    <div
+      className="absolute bottom-0 left-0 h-1 bg-gold to-transparent rounded-bl-2xl rounded-tr-2xl mx-1"
+      style={{ width: `${progress}%` }}
+    ></div>
+  );
+});
+
+ProgressBar.displayName = "ProgressBar";
+
+const TickProgress = memo(() => {
   const setTooltip = useUIStore((state) => state.setTooltip);
   const { nextBlockTimestamp } = useNextBlockTimestamp();
 
@@ -394,4 +405,4 @@ const TickProgress = () => {
       {progress.toFixed()}%
     </div>
   );
-};
+});
