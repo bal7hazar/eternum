@@ -311,6 +311,22 @@ export class EternumProvider extends EnhancedDojoProvider {
     return await this.executeAndCheckTransaction(signer, calls);
   }
 
+  public async bridges_start_withdraw_from_realm(props: SystemProps.BridgeStartWithdrawFromRealmProps[]) {
+    const { signer } = props[0];
+    const contractAddress = getContractByName(this.manifest, `${NAMESPACE}-resource_bridge_systems`);
+
+    let calls: Call[] = [];
+    props.forEach(({ resources, through_bank_id, from_realm_entity_id }: SystemProps.BridgeStartWithdrawFromRealmProps) => {
+      const subcalls = resources.map((resource) => ({
+        contractAddress,
+        entrypoint: "start_withdraw",
+        calldata: [through_bank_id, from_realm_entity_id, resource.tokenAddress, resource.amount],
+      }));
+      calls.push(...subcalls);
+    });
+    return await this.executeAndCheckTransaction(signer, calls);
+  }
+
   public async bridge_finish_withdraw_from_realm(props: SystemProps.BridgeFinishWithdrawFromRealmProps) {
     const { donkey_resources, through_bank_id, recipient_address, client_fee_recipient, signer } = props;
 

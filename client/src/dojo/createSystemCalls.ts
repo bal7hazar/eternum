@@ -170,6 +170,10 @@ export function createSystemCalls({ provider }: SetupNetworkResult) {
     await provider.contributes_to_construction(props);
   };
 
+  const bridges_start_withdraw_from_realm = async (props: SystemProps.BridgeStartWithdrawFromRealmProps[]) => {
+    await provider.bridges_start_withdraw_from_realm(props);
+  };
+
   const set_access = async (props: SystemProps.SetAccessProps) => {
     await provider.set_access(props);
   };
@@ -306,6 +310,7 @@ export function createSystemCalls({ provider }: SetupNetworkResult) {
     create_hyperstructure,
     contribute_to_construction,
     contributes_to_construction,
+    bridges_start_withdraw_from_realm,
     set_access,
     set_co_owners,
     get_points,

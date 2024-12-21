@@ -139,6 +139,10 @@ export function createSystemCalls({ provider }: SetupNetworkResult) {
     return await provider.bridge_start_withdraw_from_realm(props);
   };
 
+  const bridges_start_withdraw_from_realm = async (props: SystemProps.BridgeStartWithdrawFromRealmProps[]) => {
+    return await provider.bridges_start_withdraw_from_realm(props);
+  };
+
   const bridge_finish_withdraw_from_realm = async (props: SystemProps.BridgeFinishWithdrawFromRealmProps) => {
     return await provider.bridge_finish_withdraw_from_realm(props);
   };
@@ -168,6 +172,7 @@ export function createSystemCalls({ provider }: SetupNetworkResult) {
     mint_test_lords: withQueueing(withErrorHandling(mint_test_lords)),
     bridge_resources_into_realm: withQueueing(withErrorHandling(bridge_resources_into_realm)),
     bridge_start_withdraw_from_realm: withQueueing(withErrorHandling(bridge_start_withdraw_from_realm)),
+    bridges_start_withdraw_from_realm: withQueueing(withErrorHandling(bridges_start_withdraw_from_realm)),
     bridge_finish_withdraw_from_realm: withQueueing(withErrorHandling(bridge_finish_withdraw_from_realm)),
   };
 

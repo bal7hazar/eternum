@@ -1,12 +1,9 @@
 import clsx from "clsx";
 import { useState } from "react";
-import { AddTroops } from "./scripts/add-troops";
-import { Build } from "./scripts/build";
+import { Bridges } from "./scripts/bridges";
 import { Contributions } from "./scripts/contributions";
-import { CreateArmies } from "./scripts/create-armies";
 import { Print } from "./scripts/print";
 import { Show } from "./scripts/show";
-import { Skip } from "./scripts/skip";
 import { Transfers } from "./scripts/transfers";
 
 export const Scripts = () => {
@@ -23,12 +20,9 @@ export const Scripts = () => {
       <div className={clsx("relative text-black px-2 flex flex-col gap-y-2", unfolded ? "block" : "hidden")}>
         <Print />
         <Show />
-        <Skip />
-        <Build />
-        <CreateArmies />
-        <AddTroops />
         <Transfers />
         <Contributions />
+        <Bridges />
       </div>
     </div>
   );

@@ -31,6 +31,9 @@ interface ScriptStore {
   contributions: { items: Transfer[] };
   setContributions: (contributions: { items: Transfer[] }) => void;
   resetContributions: () => void;
+  bridges: { items: Transfer[] };
+  setBridges: (bridges: { items: Transfer[] }) => void;
+  resetBridges: () => void;
   autopickup: boolean;
   setAutopickup: (autopickup: boolean) => void;
 }
@@ -55,6 +58,9 @@ const useScriptStore = create<ScriptStore>((set) => ({
   contributions: { items: [] as Transfer[] },
   setContributions: (contributions) => set({ contributions }),
   resetContributions: () => set({ contributions: { items: [] } }),
+  bridges: { items: [] as Transfer[] },
+  setBridges: (bridges) => set({ bridges }),
+  resetBridges: () => set({ bridges: { items: [] } }),
   autopickup: false,
   setAutopickup: (autopickup) => set({ autopickup }),
 }));
