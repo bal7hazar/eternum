@@ -2,7 +2,6 @@ import { realmsAddress } from "@/config";
 import { useAccount } from "@starknet-react/core";
 import { useCallback } from "react";
 import { toast } from "sonner";
-import { env } from "../../env";
 import { useDojo } from "./context/DojoContext";
 
 export const useBridgeAsset = () => {
@@ -27,7 +26,7 @@ export const useBridgeAsset = () => {
           resources: resources,
           through_bank_id: throughBankId,
           recipient_realm_entity_id: recipientRealmEntityId,
-          client_fee_recipient: env.VITE_PUBLIC_CLIENT_FEE_RECIPIENT,
+          client_fee_recipient: account.address,
         })
           .then((resp) => {
             toast(`Transfer initiated successfully`);
@@ -70,7 +69,7 @@ export const useBridgeAsset = () => {
           donkey_resources: donkeyResources,
           through_bank_id: throughBankId,
           recipient_address: account.address,
-          client_fee_recipient: env.VITE_PUBLIC_CLIENT_FEE_RECIPIENT,
+          client_fee_recipient: account.address,
         })
           .then((resp) => {
             toast(`Withdrawal Completed! Resources sent to your wallet!`);
